@@ -1,5 +1,6 @@
 
-name: Web Application CI
+@'
+name: SCM Project CI
 
 on:
   pull_request:
@@ -8,20 +9,25 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - name: Check repository files
+        run: |
+          test -f README.md
+          echo "README.md exists."
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
+      - name: Check Markdown documentation
+        run: |
+          files=$(find . -type f -name "*.md" -not -path "./.git/*")
+          if [ -z "$files" ]; then
+            echo "Error: No Markdown files found."
+            exit 1
+          fi
+          echo "Markdown documentation found:"
+          echo "$files"
+'@ | Set-Content -Path ".github/workflows/ci.yml" -Encoding utf8
