@@ -1,6 +1,4 @@
-
-@'
-name: SCM Project CI
+﻿name: SCM Project CI
 
 on:
   pull_request:
@@ -11,23 +9,9 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check repository files
-        run: |
-          test -f README.md
-          echo "README.md exists."
-
-      - name: Check Markdown documentation
-        run: |
-          files=$(find . -type f -name "*.md" -not -path "./.git/*")
-          if [ -z "$files" ]; then
-            echo "Error: No Markdown files found."
-            exit 1
-          fi
-          echo "Markdown documentation found:"
-          echo "$files"
-'@ | Set-Content -Path ".github/workflows/ci.yml" -Encoding utf8
+      - name: Check README
+        run: test -f README.md
