@@ -597,3 +597,152 @@ Task completion
 [ ] Verified a successful deployment from main
 
 Important: The YAML and documentation provide the pipeline structure, but a successful deployment depends on the application scripts, tests, build output, and GitHub Pages configuration actually being present. Verify these in your repository before reporting the task as fully implemented.
+
+# Deliverable: Implement a CI/CD Pipeline Using Git Integration
+
+## 1. Introduction
+
+Continuous Integration and Continuous Deployment (CI/CD) automate the process of testing, validating, and deploying software changes. For the Critical-Thinking-Project web application, Git is used for version control, while GitHub Actions automates testing, code-quality checks, and website deployment.
+
+The pipeline helps identify errors early, reduces manual work, and ensures that only changes that pass the required checks are deployed.
+
+## 2. Tools and Technologies
+
+The pipeline uses the following tools:
+
+- **Git:** Tracks changes and manages branches and commits.
+- **GitHub:** Hosts the repository and supports collaboration through pull requests.
+- **GitHub Actions:** Runs automated workflows when code is pushed or a pull request is opened.
+- **Node.js and npm:** Install project dependencies and run tests and quality checks.
+- **Vitest:** Executes automated JavaScript unit tests.
+- **ESLint:** Checks JavaScript code quality.
+- **markdownlint-cli2:** Checks Markdown documentation.
+- **HTML-Validate:** Validates HTML files.
+- **Stylelint:** Checks CSS code quality.
+- **GitHub Pages:** Hosts the static website.
+
+## 3. CI/CD Pipeline Configuration
+
+The workflow is stored in:
+
+`.github/workflows/ci.yml`
+
+The pipeline consists of three jobs:
+
+### Job 1: Quality Checks
+
+The quality job:
+
+1. Checks out the repository.
+2. Sets up Node.js.
+3. Installs dependencies using `npm ci`.
+4. Runs unit tests using `npm test`.
+5. Runs Markdown, JavaScript, HTML, and CSS lint checks using `npm run lint`.
+6. Checks for whitespace errors using `git diff --check`.
+
+If any required command fails, the quality job fails and the dependent deployment jobs do not proceed.
+
+### Job 2: Build and Prepare the Website
+
+After the quality job succeeds, the build job:
+
+1. Configures GitHub Pages.
+2. Packages the contents of the `site/` directory as a deployment artifact.
+
+The website files are prepared for publication without requiring a separate manual upload.
+
+### Job 3: Deploy the Website
+
+The deployment job runs only when code is pushed to the `main` branch and the preceding jobs succeed. It publishes the prepared website to GitHub Pages using the GitHub Actions deployment process.
+
+## 4. Pipeline Triggers
+
+The workflow is configured to run in these situations:
+
+- **Push to `main`:** Runs checks and, if successful, deploys the website.
+- **Push to a `feature/**` branch:** Runs the quality checks and prepares the website artifact; it does not deploy to the live website.
+- **Pull request targeting `main`:** Runs quality checks to help prevent defective code from being merged.
+- **Manual trigger:** Allows a workflow run to be started from the GitHub Actions interface.
+
+## 5. How to Trigger Automated Tests
+
+### Method A: Run tests locally
+
+Open PowerShell in the project directory and execute:
+
+```powershell
+npm.cmd ci
+npm.cmd test
+npm.cmd run lint
+```
+
+The test command runs the unit tests defined in the `tests/` directory. The lint command checks Markdown, JavaScript, HTML, and CSS.
+
+### Method B: Trigger tests through Git
+
+After making a change, stage and commit it on a feature branch:
+
+```powershell
+git switch -c feature/example-update
+git add .
+git commit -m "test: verify CI pipeline"
+git push -u origin feature/example-update
+```
+
+Replace the example change with the actual files you intend to commit. Review `git status` before staging to avoid including unwanted backup files or nested repositories.
+
+Pushing the branch triggers GitHub Actions automatically. Open the repository's **Actions** tab to review the workflow run and inspect any failed step.
+
+### Method C: Test a pull request
+
+1. Push the feature branch to GitHub.
+2. Open the repository and select **Pull requests**.
+3. Create a pull request from the feature branch into `main`.
+4. Wait for the automated checks to complete.
+5. Review the results and fix any failures before merging.
+
+## 6. How to Deploy New Code
+
+To deploy a website update:
+
+1. Create a feature branch.
+2. Edit the website files in the `site/` directory.
+3. Run the tests and lint checks locally.
+4. Commit and push the changes.
+5. Open a pull request targeting `main`.
+6. Review the changes and ensure the required checks pass.
+7. Merge the pull request into `main`.
+8. GitHub Actions runs the pipeline on the updated `main` branch.
+9. After successful quality and build jobs, the deployment job publishes the website to GitHub Pages.
+10. Open the published website and verify that the changes appear correctly.
+
+Website URL:
+
+<https://ishaqsalimon-commits.github.io/Critical-Thinking-Project/>
+
+The URL will work once GitHub Pages is configured and the first deployment completes successfully.
+
+## 7. Security and Best Practices
+
+The pipeline follows these practices:
+
+- Keep GitHub Actions permissions limited to the permissions required by each job.
+- Use pull requests and code reviews to control changes to `main`.
+- Never commit passwords, access tokens, private SSH keys, or other secrets.
+- Keep dependencies updated and review dependency changes.
+- Investigate failed tests and lint checks before merging.
+- Protect the `main` branch with appropriate branch protection rules.
+- Review deployment logs in GitHub Actions when troubleshooting.
+
+## 8. Testing and Verification
+
+The pipeline can be verified by making a small change and pushing it to a feature branch. Confirm that GitHub Actions starts automatically, that the unit tests and lint checks complete successfully, and that the pull request displays the check results.
+
+After merging the change into `main`, verify that the deployment job succeeds and that the updated website is available on GitHub Pages.
+
+Record the actual workflow results and any screenshots required by the assignment. Do not report a successful deployment until the deployment job has completed successfully.
+
+## 9. Conclusion
+
+The CI/CD pipeline integrates Git version control with automated testing, code-quality checks, artifact preparation, and GitHub Pages deployment. It supports a feature-branch workflow, helps identify defects before merging, and automates publication of approved changes to the live website. This improves release consistency, reduces manual effort, and supports reliable software delivery.
+
