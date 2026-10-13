@@ -256,12 +256,12 @@ If Git reports a conflict:
   git add &lt;conflicted-file&gt;
    git commit
 
-6. Run unit and integration tests.
-7. Push the updated branch and allow CI to run again.
+1. Run unit and integration tests.
+2. Push the updated branch and allow CI to run again.
 
 To reduce conflicts, developers should keep branches short-lived, pull or fetch changes frequently, communicate about shared files, and submit small pull requests.
 
-8. Collaboration in a distributed team
+1. Collaboration in a distributed team
 This workflow supports team members working in different locations and time zones.
 
 - Independent development: Feature branches let developers work simultaneously without destabilizing main.
