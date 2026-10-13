@@ -1,0 +1,32 @@
+{
+  "name": "critical-thinking-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint:markdown": "markdownlint-cli2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ishaqsalimon-commits/Critical-Thinking-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ishaqsalimon-commits/Critical-Thinking-Project/issues"
+  },
+  "homepage": "https://github.com/ishaqsalimon-commits/Critical-Thinking-Project#readme",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "html-validate": "^11.16.2",
+    "markdownlint-cli2": "^0.23.3",
+    "stylelint": "^17.16.0",
+    "stylelint-config-standard": "^40.0.0",
+    "vitest": "^5.0.4"
+  }
+}
