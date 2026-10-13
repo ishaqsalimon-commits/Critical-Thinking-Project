@@ -4,8 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint:markdown": "markdownlint-cli2"
+    "test": "vitest run",
+    "lint:markdown": "markdownlint-cli2",
+    "lint:js": "eslint \"site/**/*.js\" \"tests/**/*.js\"",
+    "lint:html": "html-validate \"site/**/*.html\"",
+    "lint:css": "stylelint \"site/**/*.css\"",
+    "lint": "npm run lint:markdown && npm run lint:js && npm run lint:html && npm run lint:css"
   },
   "repository": {
     "type": "git",
@@ -14,7 +18,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/ishaqsalimon-commits/Critical-Thinking-Project/issues"
   },

@@ -1,0 +1,20 @@
+body {
+    margin: 0;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+main {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    overflow-wrap: anywhere;
+}
+
+a {
+    color: #0645ad;
+}
+

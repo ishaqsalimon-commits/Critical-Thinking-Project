@@ -256,12 +256,12 @@ If Git reports a conflict:
   git add &lt;conflicted-file&gt;
    git commit
 
-1. Run unit and integration tests.
-2. Push the updated branch and allow CI to run again.
+Run unit and integration tests.
+Push the updated branch and allow CI to run again.
 
 To reduce conflicts, developers should keep branches short-lived, pull or fetch changes frequently, communicate about shared files, and submit small pull requests.
 
-1. Collaboration in a distributed team
+Collaboration in a distributed team
 This workflow supports team members working in different locations and time zones.
 
 - Independent development: Feature branches let developers work simultaneously without destabilizing main.
@@ -290,3 +290,310 @@ Merge only after all required reviews and checks succeed.
 
 Conclusion
 A feature-branch Git workflow combined with pull requests, peer reviews, and automated integration testing helps a team develop a web application safely and efficiently. It allows distributed developers to work independently while maintaining a stable main branch. Consistent merge and rebase policies, clear communication, and branch protection further reduce integration problems and improve software quality.
+
+Task 3: Automate Code Quality and Deployment
+CI/CD Integration: To ensure code quality and rapid iteration, the team wants to integrate Git with a Continuous Integration/Continuous Deployment (CI/CD) pipeline. You are tasked with setting up automated tests that run every time a new feature branch is pushed.
+
+Use tools Using GitHub Actions to set up the pipeline. Ensure that the pipeline automatically runs unit tests, checks for code quality, and deploys changes to a staging environment when they pass.
+
+Deliverable: Implement a CI/CD pipeline using Git integration. Provide documentation that explains how the pipeline works, how to trigger tests, and how to deploy new code.
+Task 3: Automate Code Quality and Deployment Using GitHub Actions
+For your Critical-Thinking-Project repository, you can implement a CI/CD pipeline using GitHub Actions. The pipeline will automatically test your application, check code quality, and deploy successful changes to a staging environment.
+You will complete two deliverables:
+
+1. A GitHub Actions workflow file: .github/workflows/ci.yml
+2. Documentation explaining how the pipeline works, how to trigger tests, and how to deploy new code.
+Step 1: Understand how the pipeline works
+3. Developer pushes a feature branch
+Git → GitHub
+
+4. GitHub Actions starts the pipeline
+Triggered by a push or pull request
+
+5. Run tests
+Unit tests
+
+6. Check quality
+Linting and validation
+
+7. Review and merge
+Only merge after required checks pass
+
+8. Deploy to staging
+Automatically after successful checks on main
+
+Important: Because your project is a web application, the exact test and deployment commands depend on its technology. The example below is for a basic HTML, CSS, and JavaScript project. It validates the files and deploys the static site to GitHub Pages as a staging-style environment. If your project uses Node.js, Python, or a cloud hosting service, the testing and deployment steps will need to be adapted.
+Step 2: Create the GitHub Actions workflow
+Open PowerShell in your existing repository:
+cd C:\Users\hp\Documents\Workspace\Critical-Thinking-Project
+
+Create the workflow directory and file:
+New-Item -ItemType Directory -Force .github\workflows
+notepad .github\workflows\ci.yml
+
+If Notepad does not open, run:
+notepad.exe .github\workflows\ci.yml
+
+Copy the following YAML into the file and save it.
+
+```yaml
+name: Web Application CI/CD ```
+
+on:
+  push:
+    branches:
+      - "feature/**"
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-quality:
+    name: Unit Tests and Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Check code quality
+        run: npm run lint
+
+      - name: Build staging files
+        run: npm run build
+
+      - name: Upload website artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-site
+          path: public/
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: test-and-quality
+ if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download website artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: staging-site
+          path: public/
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public/
+
+      - name: Deploy to staging site
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+        The pipeline runs when a feature/** branch or main receives a push, when a pull request targets main, or when you manually start it. A pull request runs the checks but does not deploy.
+Step 3: Prepare the application
+The workflow above expects a Node.js project containing a package.json, a lock file named package-lock.json, and a public directory produced by the build command.
+If these files are not in your repository yet, the workflow will fail until you add them.
+Your package.json must define the commands the pipeline uses. For example:
+{
+  "name": "critical-thinking-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "lint": "html-validate \"public/**/*.html\"",
+    "build": "node scripts/build.js"
+  },
+  "devDependencies": {
+    "html-validate": "^10.0.0"
+  }
+}
+
+This is a starting example, not a complete application. You must create scripts/build.js to generate public/, and add actual unit tests. For a plain static HTML project, the build script can simply copy your site files into public/.
+After creating package.json, run these commands locally to create the lock file and install dependencies:
+npm install
+
+Then create a test file, for example test/app.test.js, with a basic unit test:
+const test = require('node:test');
+const assert = require('node:assert/strict');
+
+test('application arithmetic works correctly', () => {
+  assert.equal(2 + 2, 4);
+});
+
+Because this test uses CommonJS syntax, make sure your project is configured for CommonJS (or use the appropriate module syntax for your project). The test is only a starter example; replace it with tests that check your application's real functionality.
+For a real web application, your unit tests should verify things such as form validation, product calculations, login logic, or order processing.
+Step 4: Configure GitHub Pages
+The deployment job requires GitHub Pages to be enabled.
+
+1. Open your repository on GitHub.
+2. Go to Settings → Pages.
+3. Under Build and deployment, select GitHub Actions as the source.
+4. Save the settings if prompted.
+The workflow publishes the public/ directory as a website. GitHub Pages is a public hosting service, so this provides a staging-style deployment rather than an isolated private staging server. Do not publish secrets or confidential data in public/.
+Step 5: Commit and push the workflow
+In PowerShell, run these commands from your repository:
+git status
+git add .github/workflows/ci.yml
+git add package.json package-lock.json test scripts public
+git commit -m "Add automated CI/CD pipeline"
+git push origin main
+
+Run the git add commands for the application files only after creating them. If you have not created the test, scripts, or public folders yet, complete Step 3 first.
+If Git rejects the push because the remote branch has new commits, do not force-push. Resolve the changes first:
+git pull --rebase origin main
+git push origin main
+
+If Git reports conflicts, resolve them before continuing.
+Step 6: Trigger and verify automated tests
+
+A. Create a feature branch
+git switch -c feature/automated-tests
+
+Make a code change, then commit and push:
+git add .
+git commit -m "Add automated test changes"
+git push -u origin feature/automated-tests
+
+B. Check the workflow
+Open your GitHub repository and select Actions. Open the Web Application CI/CD workflow run.
+Confirm that the unit tests, code-quality checks, and build steps pass.
+
+C. Create a pull request
+Open a pull request from feature/automated-tests into main. Review the changes and confirm the checks pass before merging.
+
+D. Deploy the updated application
+After merging the feature into main, the workflow runs again. If all tests, quality checks, and the build succeed, the deployment job publishes the website.
+Find the deployment URL in the successful run or under the repository's Deployments section.
+
+Step 7: Document the pipeline
+Create a Markdown file named CI-CD-Documentation.md in your repository root:
+notepad.exe CI-CD-Documentation.md
+
+Copy this documentation into the file.
+CI/CD Pipeline Implementation and Documentation
+
+1. Introduction
+This project implements a Continuous Integration and Continuous Deployment (CI/CD) pipeline using Git, GitHub, and GitHub Actions. The purpose is to automate software testing, code quality checks, and deployment to a staging-style website environment.
+The pipeline reduces manual work, identifies errors early, and improves the reliability and speed of software delivery.
+2. Tools and Technologies
+
+- Git: Tracks source-code changes.
+- GitHub: Hosts the repository and supports collaboration.
+- GitHub Actions: Automates testing, validation, and deployment.
+- Node.js: Runs the project's JavaScript tests and scripts.
+- npm: Installs dependencies and runs project scripts.
+- HTML Validate: Checks HTML files for markup errors.
+- GitHub Pages: Hosts the deployed static website.
+
+1. Pipeline Configuration
+The workflow is stored in .github/workflows/ci.yml.
+It is triggered by:
+
+- Pushes to feature branches matching feature/**.
+- Pushes to the main branch.
+- Pull requests targeting main.
+- Manual execution through the GitHub Actions interface.
+
+1. Pipeline Stages
+Stage 1: Source Code Checkout
+GitHub Actions checks out the repository so the runner can access the latest source code.
+Stage 2: Dependency Installation
+The workflow uses npm ci to install the dependencies specified by the project's lock file.
+Stage 3: Automated Unit Testing
+The workflow runs npm test to execute the application's unit tests. These tests help identify defects before code is integrated or deployed.
+Stage 4: Code Quality Checks
+The workflow runs npm run lint to validate the project's HTML markup and identify quality issues.
+Stage 5: Build
+The workflow runs npm run build to prepare the files required for deployment. The build must generate the website in the public/ directory.
+Stage 6: Artifact Creation
+The workflow uploads the generated website as a build artifact. The deployment job retrieves this artifact instead of rebuilding the application.
+Stage 7: Staging Deployment
+When the pipeline runs successfully on main, GitHub Actions publishes the website through GitHub Pages.
+Pull requests run the validation and build stages but do not deploy the website.
+2. How to Trigger Tests
+Developers create a feature branch, make their changes, and push the branch to GitHub.
+Example commands:
+git switch -c feature/new-feature
+git add .
+git commit -m "Add new feature"
+git push -u origin feature/new-feature
+GitHub Actions automatically starts the workflow. Developers can view its progress and results under the repository's Actions tab.
+3. How to Deploy New Code
+4. Create a feature branch.
+5. Implement and test the changes.
+6. Commit and push the changes to GitHub.
+7. Open a pull request targeting main.
+8. Review the code and ensure all required checks pass.
+9. Merge the pull request.
+10. Allow GitHub Actions to execute the pipeline on main.
+11. Verify that the deployment job succeeds and open the published website.
+Deployment occurs automatically only after the required checks and build succeed.
+12. Failure Handling
+If a unit test, quality check, or build fails, the dependent deployment job does not run.
+The developer should inspect the failed job logs, correct the problem, commit the fix, and push again. GitHub Actions will rerun the workflow.
+13. Security and Best Practices
+
+- Protect the main branch.
+- Require pull requests and successful status checks before merging.
+- Use least-privilege workflow permissions.
+- Keep credentials and tokens out of source code.
+- Store necessary deployment secrets in GitHub Secrets or environment secrets.
+- Use automated tests and code reviews to reduce defects.
+- Pin third-party actions to verified commit SHAs when stronger supply-chain security is required.
+- Never publish confidential information through GitHub Pages.
+Expected Results
+The completed pipeline should automatically test and validate feature-branch changes, verify pull requests, build the application, and deploy successful changes merged into main.
+This approach improves development efficiency, catches defects earlier, and provides a repeatable deployment process.
+Conclusion
+Integrating GitHub Actions into the software development workflow reduces manual testing and deployment effort. Automated checks improve code quality, while deployment automation makes successful releases more consistent and reliable.
+
+Step 8: Commit the documentation
+git add CI-CD-Documentation.md
+git commit -m "Document CI/CD pipeline implementation"
+git push origin main
+
+Final verification checklist
+Task completion
+0 of 9
+[ ] Created .github/workflows/ci.yml
+[ ] Added package.json and package-lock.json
+[ ] Implemented actual unit tests
+[ ] Configured code-quality checks
+[ ] Created a build that generates public/
+[ ] Enabled GitHub Pages using GitHub Actions
+[ ] Pushed the workflow and documentation to GitHub
+[ ] Verified a successful feature-branch workflow
+[ ] Verified a successful deployment from main
+
+Important: The YAML and documentation provide the pipeline structure, but a successful deployment depends on the application scripts, tests, build output, and GitHub Pages configuration actually being present. Verify these in your repository before reporting the task as fully implemented.
