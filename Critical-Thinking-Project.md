@@ -753,3 +753,416 @@ Implement security best practices in Git, including setting up user access contr
 Ensure that there is a mechanism for auditing changes, so all code changes can be tracked and verified.
 
 Deliverable: Set up security best practices in your Git repository. Document how you configured access controls, enabled branch protection, and enforced commit signing. Explain how this ensures the security and integrity of the codebase.
+
+*Answer to task 4:*
+Enforce Security Best Practices, you need to configure security on your Critical-Thinking-Project GitHub repository and document the settings, evidence, and benefits.
+We’ll cover four main controls: repository access permissions, SSH key management, branch protection, and signed commits. We’ll also document how Git history and GitHub pull requests provide an audit trail.
+The important distinction is that writing about a security control is not the same as enabling it. Follow the steps below, then record the settings you actually enabled.
+Step 1: Configure repository access controls
+Open your repository:
+Repository access settings:
+
+1. Find Collaborators or Collaborators and teams in the repository settings.
+2. Review who has access.
+3. Remove anyone who no longer needs access.
+4. Give each collaborator the minimum permission needed: Read — view and discuss code; Write — contribute code; Admin — manage repository settings and security; reserve this for trusted maintainers.
+5. Keep your own account protected with two-factor authentication.
+For a team project, developers should generally work on feature branches and submit pull requests rather than pushing changes directly to main. GitHub's repository roles support different permission levels for different responsibilities.
+
+GitHub
+
+Step 2: Configure SSH keys for Git access
+In PowerShell, check whether you already have an SSH key:
+Get-ChildItem $env:USERPROFILE\.ssh
+
+If you already use SSH successfully with GitHub, you can retain that authentication key. Do not share or upload any private key file.
+If you need to create an authentication key, use:
+ssh-keygen -t ed25519 -C "your-github-email@example.com"
+
+Follow the prompts and protect the private key with a passphrase. Then display the public key:
+Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub
+
+Copy the public key and add it under GitHub Settings → SSH and GPG keys → New SSH key. Give it a descriptive title and select the authentication-key purpose.
+Test your connection:
+ssh -T git@github.com
+
+If you already have a working SSH key, do not overwrite it. Check that your Git remote uses SSH:
+git remote -v
+
+Your repository's SSH remote should look like:
+
+<git@github.com:ishaqsalimon-commits/Critical-Thinking-Project.git>
+
+Authentication keys and commit-signing keys have different purposes. Next, configure a signing key so GitHub can verify that your commits were signed.
+Step 3: Enable signed commits
+Signed commits help verify that a commit was signed using a key associated with your GitHub account. For this setup, use a separate SSH signing key.
+3.1 Generate a signing key
+Run this in PowerShell:
+ssh-keygen -t ed25519 -C "Git commit signing" -f "$env:USERPROFILE\.ssh\id_ed25519_signing"
+
+Choose a passphrase when prompted. If that key file already exists, stop and choose a different filename rather than overwriting it.
+Display the public key:
+Get-Content "$env:USERPROFILE\.ssh\id_ed25519_signing.pub"
+
+Copy the output. On GitHub, open Settings → SSH and GPG keys → New SSH key, and choose the Signing Key type. Paste the public key and save it. Do not upload the private key.
+3.2 Configure Git to sign commits
+Run:
+git config --global gpg.format ssh
+git config --global user.signingkey "$env:USERPROFILE/.ssh/id_ed25519_signing.pub"
+git config --global commit.gpgsign true
+
+Confirm the settings:
+git config --global --get gpg.format
+git config --global --get user.signingkey
+git config --global --get commit.gpgsign
+
+The expected values are ssh, your signing public-key path, and true.
+3.3 Create and verify a signed commit
+Once your signing key is registered, make a small, legitimate change on a feature branch and commit it:
+git switch -c feature/security-demo
+git status
+git add `<your-changed-file>`
+git commit -S -m "security: verify signed commits"
+git log -1 --show-signature
+
+Replace `<your-changed-file>` with the actual file you edited. If the branch already exists, switch to it rather than creating it again.
+Check the latest commit on GitHub. It should show Verified when GitHub successfully verifies the signature. If it does not, resolve the signing configuration before enabling mandatory signing on main.
+Step 4: Protect the main branch
+Open your repository's branch settings:
+Configure branch protectionCreate a branch protection rule targeting main. Enable the following settings where available:
+Require a pull request before merging
+Changes must be reviewed through a pull request rather than pushed directly as ordinary updates to main.
+
+Require approvals
+Require one approval if another qualified reviewer is available. For a solo project, document the limitation rather than claiming an independent review occurred.
+
+Require status checks to pass
+Select the actual quality-check job from your GitHub Actions workflow once it has run and appears in the available checks. This helps prevent merging code that fails your tests or linting.
+
+Require signed commits
+Enable this option after confirming your signed commits are verified.
+
+Prevent force pushes and branch deletion
+Leave these restrictions enabled. If available, also require conversation resolution and prevent bypassing the rules.
+
+Save the rule. GitHub documents these protections as ways to require reviews, successful status checks, and verified commit signatures. 
+
+GitHub Docs
++1
+
+Note: administrators may bypass some branch-protection requirements by default unless the applicable setting prevents bypassing. Review the available options and test the resulting behavior. 
+
+GitHub
+
+Step 5: Maintain an audit trail
+Use Git history and GitHub pull requests to track changes:
+git log --oneline --decorate
+git log --show-signature -5
+git status
+
+For each change, retain a descriptive commit message, its author and timestamp, and the associated pull request where applicable. Review GitHub's Pull requests and Actions tabs to trace approvals and CI results.
+A commit signature helps verify the signed commit, but it does not by itself prove that the code is safe. Reviews, tests, access controls, and careful handling of secrets are also necessary.
+Step 6: Document the security configuration
+Add a file named SECURITY.md to your repository. You can create it in PowerShell using the following commands from your project directory.
+Repository Security Best Practices
+
+1. Purpose
+This document describes the security controls used to protect the Critical-Thinking-Project repository, reduce unauthorized changes, and maintain the integrity and traceability of the codebase.
+2. Access Controls
+
+Repository access is managed through GitHub repository settings. Collaborators are assigned permissions based on their responsibilities, following the principle of least privilege.
+
+- Read access is used for users who only need to view or discuss the project.
+- Write access is assigned to authorized contributors.
+- Administrative access is limited to trusted maintainers.
+- Access is reviewed periodically, and unnecessary permissions are removed.
+- Two-factor authentication is recommended for accounts with repository access.
+
+3. SSH Key Management
+
+SSH keys provide secure authentication when connecting to GitHub over SSH. Public keys are registered with GitHub, while private keys remain on the owner's device and are protected by a passphrase.
+
+SSH authentication keys are used to establish access to GitHub. A separately registered SSH signing key is used to sign commits.
+
+Private keys and other credentials must never be committed to the repository or shared with other users.
+4. Branch Protection
+The main branch is protected using GitHub branch protection settings, where available. The intended controls include:
+
+- Requiring pull requests before merging.
+- Requiring approval from a qualified reviewer where possible.
+- Requiring successful automated quality checks.
+- Requiring verified signed commits.
+- Preventing force pushes and branch deletion.
+- Requiring resolution of review conversations where appropriate.
+
+These controls help prevent accidental or unauthorized changes from reaching the main branch.
+5. Signed Commits
+Git is configured to sign commits using SSH signing. The corresponding public signing key is registered with GitHub.
+Signed commits allow GitHub to verify the commit signature and display a verification status. Contributors must use valid signing keys when signed commits are required by branch protection.
+6. Audit Trail
+Git commit history records changes to tracked files, commit identifiers, authorship information, and commit messages. GitHub pull requests provide a record of proposed changes, reviews, discussions, and merge decisions. GitHub Actions records automated test results and deployment workflow runs.
+These records help maintain traceability and support investigations when a change introduces a defect or security concern.
+7. Security Benefits
+The combined controls help:
+
+- Reduce unauthorized repository access.
+- Protect the main branch from unreviewed changes.
+- Detect code-quality and test failures before merging.
+- Verify signed commits.
+- Preserve a traceable history of changes and reviews.
+- Reduce the risk of accidental exposure of sensitive information.
+
+1. Verification and Maintenance
+Repository administrators should periodically review collaborator permissions, confirm that branch protection rules remain enabled, verify commit-signing status, and inspect GitHub Actions results.
+Security settings should be tested after changes to the repository or team structure.
+Implementation status: Record each control as enabled only after verifying it in GitHub. Document any limitations, such as unavailable settings or the lack of a second reviewer.
+
+## CI/CD Pipeline Implementation and Documentation
+
+## 1.Introduction
+
+This project uses GitHub Actions to automate code quality checks and testing for the Critical-Thinking-Project repository. The pipeline helps identify errors early, maintain consistent code quality, and reduce the risk of introducing defects into the main branch.
+
+## 2. Tools and Technologies
+
+- **Git and GitHub:** Source control and collaborative development.
+- **GitHub Actions:** Automated continuous integration workflows.
+- **markdownlint-cli2:** Markdown formatting validation.
+- **ESLint:** JavaScript code quality checks.
+- **html-validate:** HTML validation.
+- **Stylelint:** CSS quality checks.
+- **Vitest:** Automated unit testing.
+- **Node.js and npm:** JavaScript runtime and package management.
+
+## 3. How the Pipeline Works
+
+The pipeline performs the following steps:
+
+1. A developer pushes changes to GitHub or opens a pull request.
+2. GitHub Actions checks out the repository.
+3. The workflow prepares the required Node.js environment and installs dependencies.
+4. Markdown linting checks documentation formatting.
+5. ESLint checks JavaScript quality.
+6. HTML validation checks the website's HTML.
+7. Stylelint checks CSS formatting and quality.
+8. Vitest executes automated unit tests.
+9. GitHub Actions reports whether the checks passed or failed.
+
+A successful workflow is indicated by a green check mark in the GitHub Actions interface.
+
+## 4. Quality Checks and Test Results
+
+The following checks passed locally:
+
+| Check | Result |
+|---|---|
+| Markdown lint | Passed — zero issues |
+| JavaScript lint | Passed |
+| HTML validation | Passed |
+| CSS lint | Passed |
+| Unit tests | Passed — 3 tests |
+
+GitHub Actions also completed successfully, as confirmed by the green workflow status.
+
+## 5. How to Trigger the Pipeline
+
+The pipeline can be triggered by pushing changes to a branch or opening a pull request, provided the workflow configuration includes the corresponding events.
+
+Example commands:
+
+```bash
+git add .
+git commit -m "docs: update project documentation"
+git push origin main
+```
+
+For feature development, create a separate branch:
+
+```bash
+git switch -c feature/new-improvement
+git add .
+git commit -m "feat: add new improvement"
+git push -u origin feature/new-improvement
+```
+
+Open a pull request on GitHub to review the changes and check the workflow results before merging.
+
+## 6. Deployment and Staging
+
+Automated testing and deployment are separate pipeline stages. The successful checks confirm that the configured quality and test jobs passed. A staging deployment is confirmed only when a deployment job has been configured and completed successfully.
+
+For this project, GitHub Pages can be configured to publish the static HTML, CSS, and JavaScript website. A separate staging environment may require an additional deployment target and workflow configuration.
+
+## 7.Security and Best Practices
+
+- Protect the `main` branch with appropriate branch protection rules.
+- Require successful CI checks before merging pull requests.
+- Use pull requests and code reviews for collaborative changes.
+- Store deployment credentials in GitHub Actions secrets when required.
+- Avoid committing passwords, tokens, or private keys.
+- Keep dependencies and GitHub Actions versions updated.
+- Review failed workflow logs and fix errors before merging.
+
+## 8. Conclusion
+
+The CI/CD implementation improves development reliability by automating documentation linting, JavaScript checks, HTML validation, CSS linting, and unit tests. The successful local checks and green GitHub Actions workflow demonstrate that the configured validation pipeline is operating successfully.
+
+Further improvements can include enforcing required status checks on `main`, expanding application-specific unit tests, and configuring a verified staging deployment.
+
+Task 5: Handle a Real-World Git Challenge
+Scenario: During the development process, two developers working on separate branches accidentally introduced conflicting changes into the main branch after a failed merge. Your task is to resolve the conflict, ensure code integrity, and identify how the team can prevent such issues in the future.
+Deliverable: Demonstrate how to resolve the merge conflict by pulling the latest code, identifying the conflicting files, and merging the changes. After resolving the conflict, update the team’s Git workflow with measures to avoid future conflicts, such as better communication or smaller, more frequent pull requests.
+
+*Answer to task 5:*
+Handle a Real-World Git Challenge
+For your Critical-Thinking-Project repository, this task involves recovering from a failed merge, resolving conflicting changes safely, testing the result, and documenting how your team will prevent similar problems.
+The goal is to keep main stable while integrating changes from branches such as feature/user-login and feature/payment.
+Part 1: Resolve the Git merge conflict
+Step 1: Open your project in PowerShell
+Use your existing project directory:
+cd C:\Users\hp\Documents\Workspace\Critical-Thinking-Project
+
+Check your current branch and working-tree status:
+git status
+git branch
+git log --oneline --graph --all -10
+
+If you have uncommitted work, save it in a commit or stash it before switching branches.
+Step 2: Pull the latest changes
+First, switch to main:
+git switch main
+
+Then fetch the latest repository history:
+git fetch origin
+
+Update your local main:
+git pull --ff-only origin main
+
+The --ff-only option prevents Git from creating an unexpected merge commit during the pull. If the command fails because your local branch has diverged, stop and inspect the history instead of forcing the update.
+Step 3: Identify conflicting files
+Start by checking:
+git status
+
+If a merge is already in progress, Git will usually list the files under Unmerged paths.
+You can also run:
+git diff --name-only --diff-filter=U
+
+This lists files with unresolved conflicts. If the list is empty and no merge is in progress, there are no currently unresolved conflicts in your working tree.
+Step 4: Merge the feature branch
+Suppose the conflicting changes came from feature/user-login. Once main is updated, merge the feature branch:
+git merge feature/user-login
+
+If the conflict came from feature/payment, use that branch instead:
+git merge feature/payment
+
+Merge one branch at a time. If Git reports a conflict, it will stop and identify the affected files.
+
+Resolve the conflict in the file
+Open each conflicted file in VS Code or another text editor. Git marks conflicting sections like this:
+
+<<<<<<< HEAD
+Login validation from main
+=======
+Login validation from feature branch
+>>>>>>> feature/user-login
+
+The sections mean:
+
+- <<<<<<< HEAD — the version from your current branch, usually main.
+- ======= — separates the two versions.
+- >>>>>>> feature/user-login — the incoming branch's version.
+Review both versions and decide which changes should remain. Combine them if both are needed. Remove all conflict markers and save the file.
+For example, the resolved code might retain both the existing validation and the new login feature, provided they are compatible.
+Important: Do not automatically accept either version without checking the intended behavior.
+Step 6: Stage the resolved files
+Check that no unresolved conflicts remain:
+git diff --name-only --diff-filter=U
+
+If the command returns no filenames, stage the files you resolved. For example:
+git add README.md
+
+Replace README.md with the actual filenames reported by Git. If you have reviewed all changes and want to stage the entire resolution, you can use:
+git add -A
+
+Review the staged changes:
+git diff --cached
+git status
+
+Confirm that the conflict markers are gone and that unrelated files have not been included accidentally.
+Step 7: Complete the merge
+After all conflicts are resolved and staged, complete the merge:
+git commit -m "fix: resolve merge conflicts"
+
+If Git says there is no merge to commit, check git status and git log before proceeding.
+Step 8: Test and push the changes
+Run the checks appropriate for your project. Your repository currently uses Markdown quality checks, so you can inspect the workflow in:
+.github/workflows/
+
+Review the configured checks and run the corresponding local commands if available. Then verify your Git history:
+git status
+git log --oneline --graph -10
+
+If main is clean and the merge has been verified, push the result:
+git push origin main
+
+For a team repository, the preferred approach is to push the fix to a dedicated branch, open a pull request, and merge through the normal review process. Direct pushes to main should be avoided when branch protection is enabled.
+If a merge is already in progress: do not switch branches or pull again. Inspect git status and resolve that merge first. If you need to abandon it, and Git confirms a merge is in progress, use git merge --abort before restarting. If the merge has already been committed, inspect the history before deciding whether a revert is necessary.
+
+Part 2: Update the team's Git workflow
+Use the following guide as the deliverable for the prevention measures.
+
+Task 5: Real-World Git Merge Conflict Resolution and Prevention
+
+Introduction
+Merge conflicts occur when multiple developers modify overlapping sections of the same file or when Git cannot automatically reconcile different changes. An unsuccessful merge can interrupt development and introduce defects if conflicts are resolved carelessly.
+The team will use a controlled Git workflow to resolve conflicts, preserve code integrity, and reduce the risk of future problems.
+
+Conflict Resolution Procedure
+Check the working-tree status using git status.
+Fetch the latest changes from the remote repository using git fetch origin.
+Update the local main branch using git pull --ff-only origin main, provided no merge is already in progress.
+Identify conflicted files using git diff --name-only --diff-filter=U.
+Review both versions of each conflicted section and determine which changes should be retained.
+Edit the affected files, remove all conflict markers, and save the changes.
+Stage the resolved files using git add.
+Review the staged changes using git diff --cached.
+Complete the merge with a descriptive commit message.
+Run the project's automated tests and quality checks.
+Push the verified changes and confirm that the remote repository is consistent.
+If the merge cannot be resolved safely, the developer should consult the team before proceeding.
+
+Measures to Prevent Future Conflicts
+Feature branching
+Developers should create separate branches for individual tasks, such as feature/user-login and feature/payment. This keeps work isolated and allows the team to review changes before integration.
+Frequent synchronization
+Developers should regularly fetch updates and integrate relevant changes from the shared development branch. They should avoid allowing feature branches to become outdated for long periods.
+Smaller, more frequent pull requests
+Each pull request should address a focused change. Smaller changes are easier to review, test, and merge, reducing the chance of overlapping modifications.
+Communication and coordination
+Developers should inform teammates when editing shared files, configuration files, or important application components. Team members should coordinate work when two features depend on the same files.
+Mandatory code reviews
+At least one authorized reviewer should inspect each pull request before merging. Reviewers should check correctness, readability, potential conflicts, and unintended changes.
+Automated testing and quality checks
+GitHub Actions should run the repository's configured tests and code-quality checks for every relevant pull request. Changes should not be merged when required checks fail.
+Branch protection
+Protect main by requiring pull requests, approving reviews, and passing required status checks. Restrict direct pushes and force pushes where appropriate.
+Consistent merge practices
+The team should document when to merge or rebase and avoid rewriting shared branch history. Developers must resolve conflicts deliberately rather than blindly accepting one version.
+
+Lessons Learned
+This incident demonstrates that Git provides conflict detection, but developers remain responsible for choosing the correct resolution. Regular synchronization, clear communication, smaller pull requests, automated checks, and code reviews can reduce integration risks.
+
+Conclusion
+The team will maintain a stable main branch by isolating work in feature branches, resolving conflicts carefully, testing all relevant changes, and integrating contributions through reviewed pull requests. These practices improve collaboration, preserve code integrity, and support reliable software delivery.
+
+Part 3: Commit and submit your documentation
+Save the guide in your project as:
+Task-5-Merge-Conflict-Resolution.md
+
+Then run these commands in PowerShell:
+git switch -c docs/task-5-merge-conflict
+git add Task-5-Merge-Conflict-Resolution.md
+git commit -m "docs: document merge conflict resolution"
+git push -u origin docs/task-5-merge-conflict
+
+Open your GitHub repository, create a pull request from docs/task-5-merge-conflict into main, review the changes, and merge it after the required checks pass.
