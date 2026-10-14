@@ -56,7 +56,7 @@ feature/login
 Developer A
 feature/payment
 Developer B
-Pull requests → Code review → Automated tests
+Pull requests â†’ Code review â†’ Automated tests
 Merge approved changes into main
 Only after all required checks pass
 Feature branches should be short-lived and focused on one task. This makes code reviews easier and reduces merge conflicts.
@@ -305,7 +305,7 @@ You will complete two deliverables:
 2. Documentation explaining how the pipeline works, how to trigger tests, and how to deploy new code.
 Step 1: Understand how the pipeline works
 3. Developer pushes a feature branch
-Git → GitHub
+Git â†’ GitHub
 
 4. GitHub Actions starts the pipeline
 Triggered by a push or pull request
@@ -457,7 +457,7 @@ Step 4: Configure GitHub Pages
 The deployment job requires GitHub Pages to be enabled.
 
 1. Open your repository on GitHub.
-2. Go to Settings → Pages.
+2. Go to Settings â†’ Pages.
 3. Under Build and deployment, select GitHub Actions as the source.
 4. Save the settings if prompted.
 The workflow publishes the public/ directory as a website. GitHub Pages is a public hosting service, so this provides a staging-style deployment rather than an isolated private staging server. Do not publish secrets or confidential data in public/.
@@ -756,7 +756,7 @@ Deliverable: Set up security best practices in your Git repository. Document how
 
 *Answer to task 4:*
 Enforce Security Best Practices, you need to configure security on your Critical-Thinking-Project GitHub repository and document the settings, evidence, and benefits.
-We’ll cover four main controls: repository access permissions, SSH key management, branch protection, and signed commits. We’ll also document how Git history and GitHub pull requests provide an audit trail.
+Weâ€™ll cover four main controls: repository access permissions, SSH key management, branch protection, and signed commits. Weâ€™ll also document how Git history and GitHub pull requests provide an audit trail.
 The important distinction is that writing about a security control is not the same as enabling it. Follow the steps below, then record the settings you actually enabled.
 Step 1: Configure repository access controls
 Open your repository:
@@ -765,7 +765,7 @@ Repository access settings:
 1. Find Collaborators or Collaborators and teams in the repository settings.
 2. Review who has access.
 3. Remove anyone who no longer needs access.
-4. Give each collaborator the minimum permission needed: Read — view and discuss code; Write — contribute code; Admin — manage repository settings and security; reserve this for trusted maintainers.
+4. Give each collaborator the minimum permission needed: Read â€” view and discuss code; Write â€” contribute code; Admin â€” manage repository settings and security; reserve this for trusted maintainers.
 5. Keep your own account protected with two-factor authentication.
 For a team project, developers should generally work on feature branches and submit pull requests rather than pushing changes directly to main. GitHub's repository roles support different permission levels for different responsibilities.
 
@@ -777,21 +777,21 @@ Get-ChildItem $env:USERPROFILE\.ssh
 
 If you already use SSH successfully with GitHub, you can retain that authentication key. Do not share or upload any private key file.
 If you need to create an authentication key, use:
-ssh-keygen -t ed25519 -C "your-github-email@example.com"
+ `ssh-keygen -t ed25519 -C "your-github-email@example.com"`
 
 Follow the prompts and protect the private key with a passphrase. Then display the public key:
 Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub
 
-Copy the public key and add it under GitHub Settings → SSH and GPG keys → New SSH key. Give it a descriptive title and select the authentication-key purpose.
+Copy the public key and add it under GitHub Settings â†’ SSH and GPG keys â†’ New SSH key. Give it a descriptive title and select the authentication-key purpose.
 Test your connection:
-ssh -T git@github.com
+`ssh -T git@github.com`
 
 If you already have a working SSH key, do not overwrite it. Check that your Git remote uses SSH:
 git remote -v
 
 Your repository's SSH remote should look like:
 
-<git@github.com:ishaqsalimon-commits/Critical-Thinking-Project.git>
+`git@github.com:ishaqsalimon-commits/Critical-Thinking-Project.git`
 
 Authentication keys and commit-signing keys have different purposes. Next, configure a signing key so GitHub can verify that your commits were signed.
 Step 3: Enable signed commits
@@ -804,7 +804,7 @@ Choose a passphrase when prompted. If that key file already exists, stop and cho
 Display the public key:
 Get-Content "$env:USERPROFILE\.ssh\id_ed25519_signing.pub"
 
-Copy the output. On GitHub, open Settings → SSH and GPG keys → New SSH key, and choose the Signing Key type. Paste the public key and save it. Do not upload the private key.
+Copy the output. On GitHub, open Settings â†’ SSH and GPG keys â†’ New SSH key, and choose the Signing Key type. Paste the public key and save it. Do not upload the private key.
 3.2 Configure Git to sign commits
 Run:
 git config --global gpg.format ssh
@@ -845,14 +845,9 @@ Enable this option after confirming your signed commits are verified.
 Prevent force pushes and branch deletion
 Leave these restrictions enabled. If available, also require conversation resolution and prevent bypassing the rules.
 
-Save the rule. GitHub documents these protections as ways to require reviews, successful status checks, and verified commit signatures. 
+Save the rule. GitHub documents these protections as ways to require reviews, successful status checks, and verified commit signatures.
 
-GitHub Docs
-+1
-
-Note: administrators may bypass some branch-protection requirements by default unless the applicable setting prevents bypassing. Review the available options and test the resulting behavior. 
-
-GitHub
+Note: administrators may bypass some branch-protection requirements by default unless the applicable setting prevents bypassing. Review the available options and test the resulting behavior.
 
 Step 5: Maintain an audit trail
 Use Git history and GitHub pull requests to track changes:
@@ -878,7 +873,7 @@ Repository access is managed through GitHub repository settings. Collaborators a
 - Access is reviewed periodically, and unnecessary permissions are removed.
 - Two-factor authentication is recommended for accounts with repository access.
 
-3. SSH Key Management
+### 3. SSH Key Management
 
 SSH keys provide secure authentication when connecting to GitHub over SSH. Public keys are registered with GitHub, while private keys remain on the owner's device and are protected by a passphrase.
 
@@ -955,12 +950,12 @@ A successful workflow is indicated by a green check mark in the GitHub Actions i
 The following checks passed locally:
 
 | Check | Result |
-|---|---|
-| Markdown lint | Passed — zero issues |
+| --- | --- |
+| Markdown lint | Passed â€” zero issues |
 | JavaScript lint | Passed |
 | HTML validation | Passed |
 | CSS lint | Passed |
-| Unit tests | Passed — 3 tests |
+| Unit tests | Passed â€” 3 tests |
 
 GitHub Actions also completed successfully, as confirmed by the green workflow status.
 
@@ -1011,7 +1006,7 @@ Further improvements can include enforcing required status checks on `main`, exp
 
 Task 5: Handle a Real-World Git Challenge
 Scenario: During the development process, two developers working on separate branches accidentally introduced conflicting changes into the main branch after a failed merge. Your task is to resolve the conflict, ensure code integrity, and identify how the team can prevent such issues in the future.
-Deliverable: Demonstrate how to resolve the merge conflict by pulling the latest code, identifying the conflicting files, and merging the changes. After resolving the conflict, update the team’s Git workflow with measures to avoid future conflicts, such as better communication or smaller, more frequent pull requests.
+Deliverable: Demonstrate how to resolve the merge conflict by pulling the latest code, identifying the conflicting files, and merging the changes. After resolving the conflict, update the teamâ€™s Git workflow with measures to avoid future conflicts, such as better communication or smaller, more frequent pull requests.
 
 *Answer to task 5:*
 Handle a Real-World Git Challenge
@@ -1060,17 +1055,17 @@ Merge one branch at a time. If Git reports a conflict, it will stop and identify
 Resolve the conflict in the file
 Open each conflicted file in VS Code or another text editor. Git marks conflicting sections like this:
 
-<<<<<<< HEAD
+`<<<<<<< HEAD`
 Login validation from main
-=======
+`=======`
 Login validation from feature branch
->>>>>>> feature/user-login
+`>>>>>>> feature/user-login`
 
 The sections mean:
 
-- <<<<<<< HEAD — the version from your current branch, usually main.
-- ======= — separates the two versions.
-- >>>>>>> feature/user-login — the incoming branch's version.
+- <<<<<<< HEAD â€” the version from your current branch, usually main.
+- ======= â€” separates the two versions.
+- >>>>>>> feature/user-login â€” the incoming branch's version.
 Review both versions and decide which changes should remain. Combine them if both are needed. Remove all conflict markers and save the file.
 For example, the resolved code might retain both the existing validation and the new login feature, provided they are compatible.
 Important: Do not automatically accept either version without checking the intended behavior.
