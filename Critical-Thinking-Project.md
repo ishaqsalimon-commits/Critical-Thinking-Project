@@ -1161,3 +1161,4 @@ git commit -m "docs: document merge conflict resolution"
 git push -u origin docs/task-5-merge-conflict
 
 Open your GitHub repository, create a pull request from docs/task-5-merge-conflict into main, review the changes, and merge it after the required checks pass.
+![Screenshot-1](Screenshot-1%20(2).png)
