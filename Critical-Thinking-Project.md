@@ -69,6 +69,7 @@ Each developer downloads a local copy of the shared GitHub repository.
 git clone git@github.com:USERNAME/PROJECT.git
 cd PROJECT
 ```
+
 Replace USERNAME/PROJECT with your GitHub username and repository name.
 Step 2: Update the main branch
 Before starting new work, obtain the latest version of the shared code.
@@ -201,6 +202,7 @@ jobs:
       - name: Build application
         run: npm run build --if-present
 ```
+
 Important: This example assumes a Node.js application with a committed package-lock.json. The team must add or configure integration-test commands and security scans according to the actual project. The optional commands shown above do not guarantee that tests or builds exist or have run; configure required checks that genuinely execute the intended validation.
 Before merging, GitHub should show all required CI checks as successful. If a test fails, the developer fixes the problem, pushes another commit to the feature branch, and waits for the checks to run again.
 
@@ -673,6 +675,7 @@ npm.cmd ci
 npm.cmd test
 npm.cmd run lint
 ```
+
 The test command runs the unit tests defined in the `tests/` directory. The lint command checks Markdown, JavaScript, HTML, and CSS.
 
 ### Method B: Trigger tests through Git
@@ -685,6 +688,7 @@ git add .
 git commit -m "test: verify CI pipeline"
 git push -u origin feature/example-update
 ```
+
 Replace the example change with the actual files you intend to commit. Review `git status` before staging to avoid including unwanted backup files or nested repositories.
 
 Pushing the branch triggers GitHub Actions automatically. Open the repository's **Actions** tab to review the workflow run and inspect any failed step.
