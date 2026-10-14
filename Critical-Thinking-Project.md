@@ -69,7 +69,6 @@ Each developer downloads a local copy of the shared GitHub repository.
 git clone git@github.com:USERNAME/PROJECT.git
 cd PROJECT
 ```
-
 Replace USERNAME/PROJECT with your GitHub username and repository name.
 Step 2: Update the main branch
 Before starting new work, obtain the latest version of the shared code.
@@ -202,7 +201,6 @@ jobs:
       - name: Build application
         run: npm run build --if-present
 ```
-
 Important: This example assumes a Node.js application with a committed package-lock.json. The team must add or configure integration-test commands and security scans according to the actual project. The optional commands shown above do not guarantee that tests or builds exist or have run; configure required checks that genuinely execute the intended validation.
 Before merging, GitHub should show all required CI checks as successful. If a test fails, the developer fixes the problem, pushes another commit to the feature branch, and waits for the checks to run again.
 
@@ -675,7 +673,6 @@ npm.cmd ci
 npm.cmd test
 npm.cmd run lint
 ```
-
 The test command runs the unit tests defined in the `tests/` directory. The lint command checks Markdown, JavaScript, HTML, and CSS.
 
 ### Method B: Trigger tests through Git
@@ -688,7 +685,6 @@ git add .
 git commit -m "test: verify CI pipeline"
 git push -u origin feature/example-update
 ```
-
 Replace the example change with the actual files you intend to commit. Review `git status` before staging to avoid including unwanted backup files or nested repositories.
 
 Pushing the branch triggers GitHub Actions automatically. Open the repository's **Actions** tab to review the workflow run and inspect any failed step.
@@ -717,7 +713,6 @@ To deploy a website update:
 10. Open the published website and verify that the changes appear correctly.
 
 Website URL:
-
 <https://ishaqsalimon-commits.github.io/Critical-Thinking-Project/>
 
 The URL will work once GitHub Pages is configured and the first deployment completes successfully.
@@ -746,3 +741,11 @@ Record the actual workflow results and any screenshots required by the assignmen
 
 The CI/CD pipeline integrates Git version control with automated testing, code-quality checks, artifact preparation, and GitHub Pages deployment. It supports a feature-branch workflow, helps identify defects before merging, and automates publication of approved changes to the live website. This improves release consistency, reduces manual effort, and supports reliable software delivery.
 
+Task 4: Enforce Security Best Practices
+Scenario: With distributed teams, securing the source code repository is critical. You need to enforce security measures that ensure that sensitive data is protected and unauthorized changes cannot be made to the codebase.
+
+Implement security best practices in Git, including setting up user access controls, managing SSH keys, enforcing branch protection, and using signed commits for critical code changes.
+
+Ensure that there is a mechanism for auditing changes, so all code changes can be tracked and verified.
+
+Deliverable: Set up security best practices in your Git repository. Document how you configured access controls, enabled branch protection, and enforced commit signing. Explain how this ensures the security and integrity of the codebase.
